@@ -5,3 +5,6 @@
 
 ## luci界面
   ![Image text](https://raw.githubusercontent.com/cnsilvan/luci-app-unblockneteasemusic/master/pic/1.png)
+  
+## 感谢
+  [这个版本Luci](https://github.com/project-openwrt/luci-app-unblockneteasemusic)
