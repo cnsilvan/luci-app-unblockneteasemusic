@@ -30,9 +30,11 @@ set_ipset() {
 			ipset=/apm3.music.163.com/unblockneteasemusic
 		EOF
 		/etc/init.d/dnsmasq reload >"/dev/null" 2>&1
+		if ! ipset list unblockneteasemusic >"/dev/null"; then ipset create unblockneteasemusic list:set; fi
 
-		if ! ipset list unblockneteasemusic >"/dev/null"; then ipset create unblockneteasemusic hash:ip; fi
-		curl -s "http://httpdns.n.netease.com/httpdns/v2/d?domain=music.163.com,interface.music.163.com,interface3.music.163.com,apm.music.163.com,apm3.music.163.com,clientlog.music.163.com,clientlog3.music.163.com" | grep -Eo '[0-9]+?\.[0-9]+?\.[0-9]+?\.[0-9]+?' | sort | uniq | awk '{print "ipset add unblockneteasemusic "$1}' | bash >"/dev/null" 2>&1
+		if ! ipset list unblockneteasemusic4 >"/dev/null"; then ipset create unblockneteasemusic4 hash:ip family inet; fi
+		curl -s "http://httpdns.n.netease.com/httpdns/v2/d?domain=music.163.com,interface.music.163.com,interface3.music.163.com,apm.music.163.com,apm3.music.163.com,clientlog.music.163.com,clientlog3.music.163.com" | grep -Eo '[0-9]+?\.[0-9]+?\.[0-9]+?\.[0-9]+?' | sort | uniq | awk '{print "ipset add unblockneteasemusic4 "$1}' | bash >"/dev/null" 2>&1
+		ipset add unblockneteasemusic unblockneteasemusic4
 		iptables -t nat -N cloud_unblockneteasemusic
 		iptables -t nat -A cloud_unblockneteasemusic -d 0.0.0.0/8 -j RETURN
 		iptables -t nat -A cloud_unblockneteasemusic -d 10.0.0.0/8 -j RETURN
@@ -45,7 +47,22 @@ set_ipset() {
 		iptables -t nat -A cloud_unblockneteasemusic -p tcp --dport 80 -j REDIRECT --to-ports "${http_port}"
 		iptables -t nat -A cloud_unblockneteasemusic -p tcp --dport 443 -j REDIRECT --to-ports "${https_port}"
 		iptables -t nat -I PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
-
+		# ipv6
+		if ! ipset list unblockneteasemusic6 >"/dev/null"; then ipset create unblockneteasemusic6 hash:ip family inet6; fi
+		domains="music.163.com"
+		for domain in $domains; do
+			ip=$(ping6 ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
+			ipset add unblockneteasemusic6 $ip
+		done
+		ipset add unblockneteasemusic unblockneteasemusic6
+		ip6tables -t nat -N cloud_unblockneteasemusic
+		ip6tables -t nat -A cloud_unblockneteasemusic -d ::/8 -j RETURN
+		ip6tables -t nat -A cloud_unblockneteasemusic -d FE80::/10 -j RETURN
+		ip6tables -t nat -A cloud_unblockneteasemusic -d FC00::/7 -j RETURN
+		ip6tables -t nat -A cloud_unblockneteasemusic -d FEC0::/10 -j RETURN
+		ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 80 -j REDIRECT --to-ports "${http_port}"
+		ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 443 -j REDIRECT --to-ports "${https_port}"
+		ip6tables -t nat -I PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
 		mkdir -p /var/etc
 		cat <<-EOF >>"/var/etc/unblockneteasemusic.include"
 			/etc/init.d/unblockneteasemusic restart
@@ -54,8 +71,12 @@ set_ipset() {
 		iptables -t nat -D PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
 		iptables -t nat -F cloud_unblockneteasemusic
 		iptables -t nat -X cloud_unblockneteasemusic
+		ip6tables -t nat -D PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
+		ip6tables -t nat -F cloud_unblockneteasemusic
+		ip6tables -t nat -X cloud_unblockneteasemusic
 		ipset destroy unblockneteasemusic
-
+		ipset destroy unblockneteasemusic4
+		ipset destroy unblockneteasemusic6
 		echo "" >"/var/etc/unblockneteasemusic.include"
 		rm -f "/tmp/dnsmasq.d/dnsmasq-unblockneteasemusic.conf"
 		/etc/init.d/dnsmasq reload >"/dev/null" 2>&1
@@ -94,7 +115,7 @@ createCertificate() {
 	openssl req -new -sha256 -key "${serverKey}" -out "${serverCsr}" -subj "/C=CN/L=Hangzhou/O=NetEase (Hangzhou) Network Co., Ltd/OU=IT Dept./CN=*.music.163.com"
 	# 使用 CA 签发服务器证书
 	touch "${extFile}"
-	echo "subjectAltName=DNS:music.163.com,DNS:*.music.163.com" > "${extFile}"
+	echo "subjectAltName=DNS:music.163.com,DNS:*.music.163.com" >"${extFile}"
 	openssl x509 -req -extfile "${extFile}" -days 1825 -in "${serverCsr}" -CA "${caCrt}" -CAkey "${caKey}" -CAcreateserial -out "${serverCrt}"
 }
 start() {
