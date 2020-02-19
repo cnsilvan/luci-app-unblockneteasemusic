@@ -8,6 +8,8 @@
 
 2. ### 有问题，尽管开issues，有空会修复（我更希望有人pr）
 
+3. ### 可能会和其他固件自带的UnblockNeteaseMusic插件冲突（编译界面找不到该插件），编译前删除其他插件（包括依赖库）
+
 ## luci界面
 
 ![Image text](https://raw.githubusercontent.com/cnsilvan/luci-app-unblockneteasemusic/master/pic/1.png)
