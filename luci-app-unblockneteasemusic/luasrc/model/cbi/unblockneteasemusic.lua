@@ -53,12 +53,20 @@ daemon_enable = s:option(Flag, "daemon_enable", translate("启用进程守护"))
 daemon_enable.description = translate("开启后，附属程序会自动检测主程序运行状态，在主程序退出时自动重启")
 daemon_enable.default = 0
 daemon_enable.rmempty = false
-
-download = s:option(FileUpload,"", translate("下载根证书"))
+delete = s:option(Button,"_delete", translate("删除根证书"))
+delete.description = translate("删除证书，以便下次启动时生成，可用于解决过期证书等问题")
+delete.inputstyle = "reload"
+delete.write = function()
+	delete_()
+end
+download = s:option(Button,"_download", translate("下载根证书"))
 download.description = translate("请在客户端信任该证书。该证书由你设备自动生成，安全可靠")
-download.rmempty = false
-download.template = "unblockneteasemusic/unblockneteasemusic_download"
-function Download()
+download.inputstyle = "reload"
+download.write = function()
+	download_()
+end
+
+function download_()
 	local sPath, sFile, fd, block
 	sPath = "/usr/share/UnblockNeteaseMusic/ca.crt"
 	sFile = nixio.fs.basename(sPath)
@@ -86,7 +94,14 @@ function Download()
 	fd:close()
 	http.close()
 end
-if luci.http.formvalue("download") then
-	Download()
+function delete_()
+	local sPath, fd
+	sPath = "/usr/share/UnblockNeteaseMusic/server.crt"
+	fd = os.remove(sPath)
+    if not fd then
+		delete.description = string.format('删除证书，以便下次启动时生成，可用于解决过期证书等问题<br/><span style="color: red">%s</span>', translate("Couldn't delete file: ") .. sPath)
+		return
+    end
+    delete.description = translate("删除证书，以便下次启动时生成，可用于解决过期证书等问题")
 end
 return mp
