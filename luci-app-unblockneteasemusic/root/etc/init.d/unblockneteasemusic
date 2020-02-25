@@ -11,6 +11,7 @@ https_port="$(uci get unblockneteasemusic.@unblockneteasemusic[0].https_port)"
 music_source="$(uci get unblockneteasemusic.@unblockneteasemusic[0].music_source)"
 music_customize_source="$(uci get unblockneteasemusic.@unblockneteasemusic[0].music_customize_source)"
 hijack_ways="$(uci get unblockneteasemusic.@unblockneteasemusic[0].hijack_ways)"
+endpoint="$(uci get unblockneteasemusic.@unblockneteasemusic[0].endpoint_enable)"
 extFile="/usr/share/UnblockNeteaseMusic/extFile.txt"
 serverCrt="/usr/share/UnblockNeteaseMusic/server.crt"
 serverKey="/usr/share/UnblockNeteaseMusic/server.key"
@@ -18,6 +19,7 @@ serverCsr="/usr/share/UnblockNeteaseMusic/server.csr"
 caCrt="/usr/share/UnblockNeteaseMusic/ca.crt"
 caKey="/usr/share/UnblockNeteaseMusic/ca.key"
 logFile="/tmp/unblockneteasemusic.log"
+exArgs=" "
 set_ipset() {
 	if [ "${set_type}" = "start" ]; then
 		mkdir -p "/tmp/dnsmasq.d"
@@ -128,10 +130,13 @@ start() {
 	if [ ! -f "$serverCrt" ]; then
 		createCertificate >>"${logFile}" 2>&1
 	fi
+	if [ "${endpoint}" = "1" ]; then
+		exArgs="-e"
+	fi
 	if [ "${music_source}" = "default" ]; then
-		nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -m 0 -c "${serverCrt}" -k "${serverKey}" >>"${logFile}" 2>&1 &
+		nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -m 0 -c "${serverCrt}" -k "${serverKey}" ${exArgs} >>"${logFile}" 2>&1 &
 	else
-		nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o "${music_customize_source}" -m 0 -c "${serverCrt}" -k "${serverKey}" >>"${logFile}" 2>&1 &
+		nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o "${music_customize_source}" -m 0 -c "${serverCrt}" -k "${serverKey}" ${exArgs} >>"${logFile}" 2>&1 &
 	fi
 
 	set_type="start"

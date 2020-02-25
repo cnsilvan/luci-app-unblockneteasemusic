@@ -2,7 +2,7 @@ local fs = require "luci.fs"
 local http = luci.http
 
 mp = Map("unblockneteasemusic", translate("解除网易云音乐播放限制 (Golang)"))
-mp.description = translate("原理：采用 [酷我/酷狗/咕咪] 音源(后续有空补充)，替换网易云音乐 灰色 歌曲链接<br/>具体使用方法参见：https://github.com/cnsilvan/luci-app-unblockneteasemusic<br/>首次使用会自动生成证书，所以较慢")
+mp.description = translate("原理：采用 [酷我/酷狗/咕咪] 音源(后续有空补充)，替换网易云音乐 灰色 歌曲链接<br/>具体使用方法参见：https://github.com/cnsilvan/luci-app-unblockneteasemusic<br/>首次使用会自动生成证书，可能较慢")
 mp:section(SimpleSection).template = "unblockneteasemusic/unblockneteasemusic_status"
 
 s = mp:section(TypedSection, "unblockneteasemusic")
@@ -53,6 +53,12 @@ daemon_enable = s:option(Flag, "daemon_enable", translate("启用进程守护"))
 daemon_enable.description = translate("开启后，附属程序会自动检测主程序运行状态，在主程序退出时自动重启")
 daemon_enable.default = 0
 daemon_enable.rmempty = false
+
+endpoint_enable = s:option(Flag, "endpoint_enable", translate("开启地址转换"))
+endpoint_enable.description = translate("开启后，设备需要信任证书，经测试ios设备需要开启，其他设备无法使用时再开启尝试")
+endpoint_enable.default = 0
+endpoint_enable.rmempty = false
+
 delete = s:option(Button,"_delete", translate("删除根证书"))
 delete.description = translate("删除证书，以便下次启动时生成，可用于解决过期证书等问题")
 delete.inputstyle = "reload"
