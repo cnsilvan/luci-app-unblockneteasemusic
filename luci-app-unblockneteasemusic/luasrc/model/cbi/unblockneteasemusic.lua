@@ -54,7 +54,7 @@ daemon_enable.description = translate("开启后，附属程序会自动检测�
 daemon_enable.default = 0
 daemon_enable.rmempty = false
 
-endpoint_enable = s:option(Flag, "endpoint_enable", translate("开启地址转换"))
+endpoint_enable = s:option(Flag, "endpoint_enable", translate("启用地址转换"))
 endpoint_enable.description = translate("开启后，设备需要信任证书，经测试ios设备需要开启，其他设备无法使用时再开启尝试")
 endpoint_enable.default = 0
 endpoint_enable.rmempty = false
