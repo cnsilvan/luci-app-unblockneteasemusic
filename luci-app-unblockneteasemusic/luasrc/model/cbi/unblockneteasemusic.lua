@@ -30,7 +30,7 @@ https_port.rmempty = false
 music_source = s:option(ListValue, "music_source", translate("音源选择"))
 music_source:value("default", translate("默认"))
 music_source:value("customize", translate("自定义"))
-music_source.description = translate("默认为kuwo:kugou")
+music_source.description = translate("默认为kuwo")
 music_source.default = "default"
 music_source.rmempty = false
 
