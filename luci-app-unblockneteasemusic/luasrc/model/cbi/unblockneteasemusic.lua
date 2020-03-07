@@ -37,7 +37,7 @@ music_source.rmempty = false
 music_customize_source = s:option(Value, "music_customize_source", translate("自定义音源"))
 music_customize_source.description = translate("自定义音源设置，如kuwo:kugou:migu ,以:隔开,migu在某些运营商下无法使用可能会导致卡顿")
 music_customize_source.default = "kuwo:kugou"
-music_customize_source.rmempty = false
+music_customize_source.rmempty = true
 music_customize_source:depends("music_source", "customize")
 
 hijack = s:option(ListValue, "hijack_ways", translate("劫持方法"))
