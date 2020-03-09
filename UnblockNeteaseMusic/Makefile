@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=UnblockNeteaseMusic
-PKG_VERSION:=0.1.7
+PKG_VERSION:=0.1.9
 PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -16,9 +16,11 @@ PKG_USE_MIPS16:=0
 
 GO_PKG:=github.com/cnsilvan/UnblockNeteaseMusic
 GO_PKG_LDFLAGS:=-s -w
+# +%Y-%m-%d %H:%M:%S cause compile error 
+COMPILE_TIME := $(shell TZ=UTC-8 date '+%Y-%m-%d/%H:%M:%S')
 GO_PKG_LDFLAGS_X:= \
-	$(GO_PKG)/version.Version=$(PKG_VERSION)
-
+	$(GO_PKG)/version.Version=$(PKG_VERSION) \
+    $(GO_PKG)/version.BuildTime="$(COMPILE_TIME)" 
 include $(INCLUDE_DIR)/package.mk
 include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk
 
@@ -39,12 +41,12 @@ define Build/Prepare
 endef
 
 define Build/Configure
-
 endef
 
 define Build/Compile
 	$(eval GO_PKG_BUILD_PKG:=$(GO_PKG))
 	$(call GoPackage/Build/Configure)
+	$(eval GO_PKG_LDFLAGS_X+=$(GO_PKG)/version.ExGoVersionInfo="$(GO_ARM) $(GO_MIPS)$(GO_MIPS64)")
 	$(call GoPackage/Build/Compile)
 	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/UnblockNeteaseMusic
 	chmod +wx $(GO_PKG_BUILD_BIN_DIR)/UnblockNeteaseMusic

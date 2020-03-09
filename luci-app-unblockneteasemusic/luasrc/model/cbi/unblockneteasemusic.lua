@@ -54,7 +54,7 @@ daemon_enable.default = 0
 daemon_enable.rmempty = false
 
 endpoint_enable = s:option(Flag, "endpoint_enable", translate("启用地址转换"))
-endpoint_enable.description = translate("开启后，设备需要信任证书，经测试ios设备需要开启，其他设备无法使用时再开启尝试")
+endpoint_enable.description = translate("开启后，设备需要信任证书，经测试ios设备需要开启，android设备使用咪咕源下载时需要开启，其他情况无法使用时再开启尝试")
 endpoint_enable.default = 0
 endpoint_enable.rmempty = false
 
