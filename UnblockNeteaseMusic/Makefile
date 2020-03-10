@@ -46,7 +46,7 @@ endef
 define Build/Compile
 	$(eval GO_PKG_BUILD_PKG:=$(GO_PKG))
 	$(call GoPackage/Build/Configure)
-	$(eval GO_PKG_LDFLAGS_X+=$(GO_PKG)/version.ExGoVersionInfo="$(GO_ARM) $(GO_MIPS)$(GO_MIPS64)")
+	$(eval GO_PKG_LDFLAGS_X+=$(GO_PKG)/version.ExGoVersionInfo="$(GO_ARM)$(GO_MIPS)$(GO_MIPS64)")
 	$(call GoPackage/Build/Compile)
 	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(GO_PKG_BUILD_BIN_DIR)/UnblockNeteaseMusic
 	chmod +wx $(GO_PKG_BUILD_BIN_DIR)/UnblockNeteaseMusic
