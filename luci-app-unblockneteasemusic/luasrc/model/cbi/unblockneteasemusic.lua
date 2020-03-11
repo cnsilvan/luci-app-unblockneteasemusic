@@ -1,7 +1,7 @@
 local http = luci.http
 
 mp = Map("unblockneteasemusic", translate("解除网易云音乐播放限制 (Golang)"))
-mp.description = translate("原理：采用 [酷我/酷狗/咕咪] 音源(后续有空补充)，替换网易云音乐 灰色 歌曲链接<br/>具体使用方法参见：https://github.com/cnsilvan/luci-app-unblockneteasemusic<br/>首次使用会自动生成证书，可能较慢")
+mp.description = translate("原理：采用 [酷我/酷狗/咕咪] 音源(后续有空补充)，替换网易云音乐 灰色 歌曲链接<br/>具体使用方法参见：https://github.com/cnsilvan/luci-app-unblockneteasemusic<br/>提示：客户端网易云音乐app能用就别升级，最新版本不一定能用")
 mp:section(SimpleSection).template = "unblockneteasemusic/unblockneteasemusic_status"
 
 s = mp:section(TypedSection, "unblockneteasemusic")
@@ -65,7 +65,7 @@ delete.write = function()
 	delete_()
 end
 download = s:option(Button,"_download", translate("下载根证书"))
-download.description = translate("请在客户端信任该证书。该证书由你设备自动生成，安全可靠")
+download.description = translate("请在客户端信任该证书。该证书由你设备自动生成，安全可靠<br/>IOS信任证书步骤：1. 安装证书--设置-描述文件-安装 2. 通用-关于本机-证书信任设置-启动完全信任")
 download.inputstyle = "reload"
 download.write = function()
 	download_()
