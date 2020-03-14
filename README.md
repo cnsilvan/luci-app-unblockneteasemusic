@@ -12,6 +12,13 @@
 
 4. ### 统一回复：golang版本的[UnblockNeteaseMusic](https://github.com/cnsilvan/UnblockNeteaseMusic) 不仅内存占用少，效率高且音质和nodejs版本一致，不要再认为golang只是一个低音质的替代版 谢谢
 
+## 编译与升级
+
+编译分两个ipk，需要一并安装。
+
+如果只需要升级UnblockNeteaseMusic依赖包，可以直接从[UnblockNeteaseMusic](https://github.com/cnsilvan/UnblockNeteaseMusic/releases)中下载对应的版本解压到/usr/bin/下 ，且赋予运行权限
+`chmod +x /usr/bin/UnblockNeteaseMusic`,最后在luci界面重新启用该插件即可完成依赖包的升级。
+
 ## luci界面
 
 ![Image text](https://raw.githubusercontent.com/cnsilvan/luci-app-unblockneteasemusic/master/pic/1.png)
