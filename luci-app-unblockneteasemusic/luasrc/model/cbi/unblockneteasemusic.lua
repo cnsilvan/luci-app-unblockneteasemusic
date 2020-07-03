@@ -48,6 +48,7 @@ hijack.description = translate("如果使用Hosts劫持，请将HTTP/HTTPS端口
 hijack.default = "dont_hijack"
 hijack.rmempty = false
 
+
 daemon_enable = s:option(Flag, "daemon_enable", translate("启用进程守护"))
 daemon_enable.description = translate("开启后，附属程序会自动检测主程序运行状态，在主程序退出时自动重启")
 daemon_enable.default = 0
@@ -57,6 +58,11 @@ endpoint_enable = s:option(Flag, "endpoint_enable", translate("启用地址转�
 endpoint_enable.description = translate("开启后，设备需要信任证书，经测试ios设备需要开启，android设备使用咪咕源下载时需要开启，其他情况无法使用时再开启尝试")
 endpoint_enable.default = 0
 endpoint_enable.rmempty = false
+
+force_best_quality = s:option(Flag, "force_best_quality", translate("强制音质优先"))
+force_best_quality.description = translate("开启后，客户端选择音质将失效")
+force_best_quality.default = 0
+force_best_quality.rmempty = false
 
 delete = s:option(Button,"_delete", translate("删除根证书"))
 delete.description = translate("删除证书，以便下次启动时生成，可用于解决过期证书等问题")
