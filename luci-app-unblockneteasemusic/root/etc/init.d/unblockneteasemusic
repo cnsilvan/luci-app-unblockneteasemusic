@@ -13,6 +13,7 @@ music_customize_source="$(uci get unblockneteasemusic.@unblockneteasemusic[0].mu
 hijack_ways="$(uci get unblockneteasemusic.@unblockneteasemusic[0].hijack_ways)"
 endpoint="$(uci get unblockneteasemusic.@unblockneteasemusic[0].endpoint_enable)"
 force_best_quality="$(uci get unblockneteasemusic.@unblockneteasemusic[0].force_best_quality)"
+search_limit="$(uci get unblockneteasemusic.@unblockneteasemusic[0].search_limit)"
 extFile="/usr/share/UnblockNeteaseMusic/extFile.txt"
 serverCrt="/usr/share/UnblockNeteaseMusic/server.crt"
 serverKey="/usr/share/UnblockNeteaseMusic/server.key"
@@ -140,9 +141,9 @@ start() {
 			exArgs="${exArgs} -b"
 		fi
 		if [ "${music_source}" = "default" ]; then
-			nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o kuwo -m 0 -c "${serverCrt}" -k "${serverKey}" ${exArgs} >>"${logFile}" 2>&1 &
+			nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o kuwo -m 0 -c "${serverCrt}" -k "${serverKey}" -l "${logFile}" -sl "${search_limit}" ${exArgs} >>"${logFile}" 2>&1 &
 		else
-			nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o "${music_customize_source}" -m 0 -c "${serverCrt}" -k "${serverKey}" ${exArgs} >>"${logFile}" 2>&1 &
+			nohup UnblockNeteaseMusic -p "${http_port}" -sp "${https_port}" -o "${music_customize_source}" -m 0 -c "${serverCrt}" -k "${serverKey}" -l "${logFile}" -sl "${search_limit}" ${exArgs} >>"${logFile}" 2>&1 &
 		fi
 		set_type="start"
 		if [ "${hijack_ways}" = "use_ipset" ]; then
