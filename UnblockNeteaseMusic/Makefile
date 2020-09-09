@@ -7,7 +7,7 @@ PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/cnsilvan/UnblockNeteaseMusic/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=aa1eb0186206671de9a6b4fa27d933bb306d4e25
+PKG_HASH:=1c6951389ed2b4ed3b5a35052ca35a9647ae74d001b0af07180a66aa0f77e816
 PKG_MAINTAINER:=Silvan <cnsilvan@gmail.com>
 
 PKG_BUILD_DEPENDS:=golang/host
