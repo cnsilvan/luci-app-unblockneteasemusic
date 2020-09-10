@@ -1,0 +1,87 @@
+name: release luci-app-unblockneteasemusic
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build_luci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          fetch-depth: 0
+          lfs: true
+      - name: set git identity
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      - name: space cleanup
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi `docker images -q`
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php* android*
+          sudo -E apt-get update
+          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+          # sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
+          # ln -s /mnt/openwrt/bin ./bin
+          # mkdir -p ./build_dir
+          # ln -s -f /mnt/openwrt/build_dir/host ./build_dir/host
+          # ln -s -f /mnt/openwrt/build_dir/hostpkg ./build_dir/hostpkg
+          # ln -s /mnt/openwrt/dl ./dl
+          # ln -s /mnt/openwrt/feeds ./feeds
+          # ln -s /mnt/openwrt/staging_dir ./staging_dir
+          df -h
+      - name: load latest version
+        run: |
+          git clone https://github.com/coolsnowwolf/lede.git --depth=1 ./tmp/lede
+          mkdir -p ./tmp/lede/package/cnsilvan/
+          rm -rf ./tmp/lede/package/lean/UnblockNeteaseMusicGo/
+          rm -rf ./tmp/lede/package/lean/UnblockNeteaseMusic/
+          rm -rf ./tmp/lede/package/lean/luci-app-unblockmusic/
+          cp -rf ./luci-app-unblockneteasemusic ./tmp/lede/package/cnsilvan/
+          cp -rf ./UnblockNeteaseMusic ./tmp/lede/package/cnsilvan/
+      - name: update feeds
+        run: |
+          ./tmp/lede/scripts/feeds update -a
+          ./tmp/lede/scripts/feeds install -a
+      - name: generate configuration file
+        run: |
+          cd ./tmp/lede
+          rm -f ./.config*
+          touch ./.config
+          #
+          cat >> .config <<EOF
+          CONFIG_PACKAGE_luci-app-unblockneteasemusic=y
+          EOF
+          #
+          # ===============================================================
+          # 
+          sed -i 's/^[ \t]*//g' ./.config
+          make defconfig
+      - name: build luci-app-unblockneteasemusic
+        run: |
+          cd ./tmp/lede
+          make -j8  V=s
+          # make package/feeds/luci/luci-base/compile V=s
+          # make package/luci-app-unblockneteasemusic/compile -j8 V=s
+      - name: package plugins
+        run: |
+          # ls tmp/lede/bin/packages/x86_64/base
+          # zip --junk-paths luci-app-unblockneteasemusic ./tmp/lede/bin/packages/x86_64/base/luci-app-unblockneteasemusic_*.ipk
+      - name: create release and upload asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: tmp/lede/bin/packages/x86_64/base/luci-app-unblockneteasemusic_*.ipk
+          file_glob: true
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: |
+            [bot] automatically publish packages compiled with the latest source code
+            [bot] UnblockNeteaseMusic library ipk is not released here,please download it [here](https://github.com/cnsilvan/UnblockNeteaseMusic) and operate according to the [readme](https://github.com/cnsilvan/luci-app-unblockneteasemusic/blob/master/README.md#%E7%BC%96%E8%AF%91%E4%B8%8E%E5%8D%87%E7%BA%A7)

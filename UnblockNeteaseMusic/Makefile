@@ -1,14 +1,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=UnblockNeteaseMusic
-PKG_VERSION:=0.2.5
+PKG_VERSION:=0.2.6
 PKG_RELEASE:=1
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/cnsilvan/UnblockNeteaseMusic/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=1c6951389ed2b4ed3b5a35052ca35a9647ae74d001b0af07180a66aa0f77e816
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/cnsilvan/UnblockNeteaseMusic.git
+PKG_SOURCE_VERSION:=7ff431267eb2b2683ea25e1b3860447aa7b482e9
 PKG_MAINTAINER:=Silvan <cnsilvan@gmail.com>
+
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)
+PKG_SOURCE:=$(PKG_SOURCE_SUBDIR)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_SOURCE_SUBDIR)
+
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
@@ -37,7 +41,8 @@ endef
 define Build/Prepare
 	# tar -xzf $(DL_DIR)/$(PKG_SOURCE) -C $(PKG_BUILD_DIR)
 	# unzip -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
-	 $(call Build/Prepare/Default)
+	tar -zxvf $(DL_DIR)/$(PKG_SOURCE) -C $(BUILD_DIR)/$(PKG_NAME) --strip-components 1
+	# $(call Build/Prepare/Default)
 endef
 
 define Build/Configure
