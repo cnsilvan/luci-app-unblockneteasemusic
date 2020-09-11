@@ -74,14 +74,18 @@ jobs:
         run: |
           # ls tmp/lede/bin/packages/x86_64/base
           # zip --junk-paths luci-app-unblockneteasemusic ./tmp/lede/bin/packages/x86_64/base/luci-app-unblockneteasemusic_*.ipk
+          mkdir -p tmp/upload/
+          cp -a tmp/lede/bin/packages/x86_64/base/luci-app-unblockneteasemusic_*.ipk tmp/upload/
+          cp -a tmp/lede/bin/packages/x86_64/base/Unblock*.ipk tmp/upload/
       - name: create release and upload asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: tmp/lede/bin/packages/x86_64/base/luci-app-unblockneteasemusic_*.ipk
+          file: tmp/upload/*
           file_glob: true
           tag: ${{ github.ref }}
           overwrite: true
           body: |
             [bot] automatically publish packages compiled with the latest source code
-            [bot] UnblockNeteaseMusic library ipk is not released here,please download it [here](https://github.com/cnsilvan/UnblockNeteaseMusic) and operate according to the [readme](https://github.com/cnsilvan/luci-app-unblockneteasemusic/blob/master/README.md#%E7%BC%96%E8%AF%91%E4%B8%8E%E5%8D%87%E7%BA%A7)
+            [bot] UnblockNeteaseMusic.ipk for all platforms will not be released here
+            [bot] please download [the latest version](https://github.com/cnsilvan/UnblockNeteaseMusic) according to the [readme](https://github.com/cnsilvan/luci-app-unblockneteasemusic/blob/master/README.md#%E7%BC%96%E8%AF%91%E4%B8%8E%E5%8D%87%E7%BA%A7)  to  complete the upgrade  after installing UnblockNeteaseMusic.ipk
