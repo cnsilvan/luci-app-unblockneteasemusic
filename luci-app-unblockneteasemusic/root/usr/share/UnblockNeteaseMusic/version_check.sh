@@ -18,7 +18,9 @@ if [ "$(uci get unblockneteasemusic.@unblockneteasemusic[0].auto_update)" == "1"
     if [ ! -n "$suffix" ]; then
         suffix=".zip"
     fi
-
+    if [ "$suffix" == "hardfloat" ]; then
+        suffix=".zip"
+    fi
     if [ -n "$(echo $GOOSS | awk -F/ '{print $1}')" ]; then
         GOOS="$(echo $GOOSS | awk -F/ '{print $1}')"
     fi

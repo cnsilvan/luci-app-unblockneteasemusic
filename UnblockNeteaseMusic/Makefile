@@ -20,6 +20,7 @@ PKG_USE_MIPS16:=0
 
 GO_PKG:=github.com/cnsilvan/UnblockNeteaseMusic
 GO_PKG_LDFLAGS:=-s -w
+# https://github.com/openwrt/packages/blob/master/lang/golang/golang-values.mk
 # +%Y-%m-%d %H:%M:%S cause compile error 
 COMPILE_TIME := $(shell TZ=UTC-8 date '+%Y-%m-%d %H:%M:%S')
 GO_PKG_LDFLAGS+= \
