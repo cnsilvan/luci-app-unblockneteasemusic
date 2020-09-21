@@ -9,7 +9,7 @@ if [ "$(uci get unblockneteasemusic.@unblockneteasemusic[0].auto_update)" == "1"
        exit 1
     fi
     currentTagCMD="$(UnblockNeteaseMusic -v | grep Version | awk '{print $2}')"
-    currentRuntimeCMD="$(UnblockNeteaseMusic -v | grep runtime|awk -F\( '{print $2}'|awk '{print $3,$4}'|sed -E 's/\)//g')"
+    currentRuntimeCMD="$(UnblockNeteaseMusic -v | grep runtime | awk -F\( '{print $2}' | awk '{print $3,$4}' | sed -E 's/\)//g'| sed 's/[ \t]*$//g')"
     latestTagCMD="$(cat ${json_file} | grep '\"tag_name\":' | sed -E 's/.*\"([^\"]+)\".*/\1/')"
     GOOSS="$(echo $currentRuntimeCMD | awk '{print $1}')"
     GOOS="linux"

@@ -48,11 +48,12 @@ end
 
 
 local currentTagCMD="UnblockNeteaseMusic -v |grep Version|awk '{print $2}'"
-local currentRuntimeCMD="UnblockNeteaseMusic -v | grep runtime|awk -F\( '{print $2}'|awk '{print $3,$4}'|sed -E 's/\)//g'"
+local currentRuntimeCMD="UnblockNeteaseMusic -v |grep runtime|awk -F\\( '{print $2}'|awk '{print $3,$4}'|sed -E 's/\)//g'|sed 's/[ \t]*$//g'"
 
 function excute_cmd(cmd)
     local t = io.popen(cmd)
-    local ret = t:read("*all")
+	local ret = t:read("*all")
+	t:close()
     return ret
 end
 function currentVersion()
