@@ -52,22 +52,31 @@ set_ipset() {
 		iptables -t nat -A cloud_unblockneteasemusic -p tcp --dport 80 -j REDIRECT --to-ports "${http_port}"
 		iptables -t nat -A cloud_unblockneteasemusic -p tcp --dport 443 -j REDIRECT --to-ports "${https_port}"
 		iptables -t nat -I PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
-		# ipv6
-		if ! ipset list unblockneteasemusic6 >"/dev/null"; then ipset create unblockneteasemusic6 hash:ip family inet6; fi
-		domains="music.163.com"
-		for domain in $domains; do
-			ip=$(ping6 ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
-			ipset add unblockneteasemusic6 $ip
-		done
-		ipset add unblockneteasemusic unblockneteasemusic6
-		ip6tables -t nat -N cloud_unblockneteasemusic
-		ip6tables -t nat -A cloud_unblockneteasemusic -d ::/8 -j RETURN
-		ip6tables -t nat -A cloud_unblockneteasemusic -d FE80::/10 -j RETURN
-		ip6tables -t nat -A cloud_unblockneteasemusic -d FC00::/7 -j RETURN
-		ip6tables -t nat -A cloud_unblockneteasemusic -d FEC0::/10 -j RETURN
-		ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 80 -j REDIRECT --to-ports "${http_port}"
-		ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 443 -j REDIRECT --to-ports "${https_port}"
-		ip6tables -t nat -I PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
+		ip6tables -h
+		if [ $? -eq 0 ]; then
+			# ipv6
+			if ! ipset list unblockneteasemusic6 >"/dev/null"; then ipset create unblockneteasemusic6 hash:ip family inet6; fi
+			domains="music.163.com"
+			for domain in $domains; do
+				ip=$(ping6 ${domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
+				if [ -n "$ip" ]; then 
+				 ipset add unblockneteasemusic6 $ip
+				else
+				 echo "ping6 bad address,please check IPv6 DNS forwards.if IPv6 DNS forwards is enabled, please restart" >>"${logFile}"
+				fi
+			done
+			ipset add unblockneteasemusic unblockneteasemusic6
+			ip6tables -t nat -N cloud_unblockneteasemusic
+			ip6tables -t nat -A cloud_unblockneteasemusic -d ::/8 -j RETURN
+			ip6tables -t nat -A cloud_unblockneteasemusic -d FE80::/10 -j RETURN
+			ip6tables -t nat -A cloud_unblockneteasemusic -d FC00::/7 -j RETURN
+			ip6tables -t nat -A cloud_unblockneteasemusic -d FEC0::/10 -j RETURN
+			ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 80 -j REDIRECT --to-ports "${http_port}"
+			ip6tables -t nat -A cloud_unblockneteasemusic -p tcp --dport 443 -j REDIRECT --to-ports "${https_port}"
+			ip6tables -t nat -I PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
+		else
+			echo "ip6tables is not supported" >>"${logFile}"
+		fi
 		mkdir -p /var/etc
 		cat <<-EOF >>"/var/etc/unblockneteasemusic.include"
 			/etc/init.d/unblockneteasemusic restart
@@ -76,12 +85,15 @@ set_ipset() {
 		iptables -t nat -D PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
 		iptables -t nat -F cloud_unblockneteasemusic
 		iptables -t nat -X cloud_unblockneteasemusic
-		ip6tables -t nat -D PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
-		ip6tables -t nat -F cloud_unblockneteasemusic
-		ip6tables -t nat -X cloud_unblockneteasemusic
 		ipset destroy unblockneteasemusic
 		ipset destroy unblockneteasemusic4
-		ipset destroy unblockneteasemusic6
+		ip6tables -h
+		if [ $? -eq 0 ]; then
+			ip6tables -t nat -D PREROUTING -p tcp -m set --match-set unblockneteasemusic dst -j cloud_unblockneteasemusic
+			ip6tables -t nat -F cloud_unblockneteasemusic
+			ip6tables -t nat -X cloud_unblockneteasemusic
+			ipset destroy unblockneteasemusic6
+		fi
 		echo "" >"/var/etc/unblockneteasemusic.include"
 		rm -f "/tmp/dnsmasq.d/dnsmasq-unblockneteasemusic.conf"
 		/etc/init.d/dnsmasq reload >"/dev/null" 2>&1
@@ -121,7 +133,7 @@ keyUsage=digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 extendedKeyUsage=serverAuth,OCSPSigning
 subjectAltName=DNS:music.163.com,DNS:*.music.163.com" >"${extFile}"
 	openssl x509 -req -extfile "${extFile}" -days 825 -in "${serverCsr}" -CA "${caCrt}" -CAkey "${caKey}" -CAcreateserial -out "${serverCrt}"
-    rm -f "${extFile}"
+	rm -f "${extFile}"
 }
 start() {
 	stop >>"${logFile}" 2>&1
